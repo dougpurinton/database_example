@@ -1,0 +1,2 @@
+$dbInt = $_POST['postStr'];
+$dbInt = explode(',', $dbInt);

@@ -45,34 +45,63 @@ if (isset($_POST['submit']))
 				}
 				else
 				{
-				 $sql = "SELECT * FROM users WHERE user_uid='$uid'";
-				 $result = mysqli_query($conn, $sql);
-				 $resultCheckUID = mysqli_num_rows($result);
-					
-				 $sql = "SELECT * FROM users WHERE user_email='$email'";
-				 $result = mysqli_query($conn, $sql);
-				 $resultCheckEmail = mysqli_num_rows($result);
-					
-					if ($resultCheckUID > 0)
+					if ($pwd !== $repwd)
 					{
-					 header("Location: ../signup.php?signup=usertaken");
+					 header("Location: ../signup.php?signup=passwordmismatch");
 					 exit();
-					}
-					elseif ($resultCheckEmail > 0)
-					{
-					 header("Location: ../signup.php?signup=emailtaken");
-					 exit();						
 					}
 					else
 					{
-					 file_put_contents("../code.txt", getToken(5));
-					 //Hashing the password
-					 $hashedPwd = password_hash($pwd, PASSWORD_DEFAULT);
-					 // Insert the user into the database
-					 $sql = "INSERT INTO users (user_first, user_last, user_email, user_uid, user_pwd, user_code) VALUES ('$first', '$last', '$email', '$uid', '$hashedPwd', '$signupcode');";
-					 mysqli_query($conn, $sql);
-					 header("Location: ../signup.php?signup=success");
-					 exit();
+					 $resultCheckUID = null;
+					 $resultCheckEmail = null;
+					 $sql = "SELECT * FROM users WHERE user_uid='$uid'";
+						if ($result = @mysqli_query($conn, $sql))
+						{
+						 $resultCheckUID = mysqli_num_rows($result);
+						}
+					
+					 $sql = "SELECT * FROM users WHERE user_email='$email'";
+						if($result = @mysqli_query($conn, $sql))
+						{
+						 $resultCheckEmail = mysqli_num_rows($result);
+						}
+
+						if (!is_null($resultCheckUID) && !is_null($resultCheckEmail))
+						{
+							if ($resultCheckUID > 0)
+							{
+							 header("Location: ../signup.php?signup=usertaken");
+							 exit();
+							}
+							elseif ($resultCheckEmail > 0)
+							{
+							 header("Location: ../signup.php?signup=emailtaken");
+							 exit();						
+							}
+							else
+							{
+							 file_put_contents("../code.txt", getToken(5));
+							 //Hashing the password
+							 $hashedPwd = password_hash($pwd, PASSWORD_DEFAULT);
+							 // Insert the user into the database
+							 $sql = "INSERT INTO users (user_first, user_last, user_email, user_uid, user_pwd, user_code) VALUES ('$first', '$last', '$email', '$uid', '$hashedPwd', '$signupcode');";
+								if (@mysqli_query($conn, $sql))
+								{
+								 header("Location: ../signup.php?signup=success");
+								 exit();
+								}
+								else
+								{
+								 header("Location: ../signup.php?signup=queryerror");
+								 exit();
+								}
+							}
+						}
+						else
+						{
+						 header("Location: ../signup.php?signup=queryerror");
+						 exit();
+						}
 					}
 				}
 			}

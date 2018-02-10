@@ -1,11 +1,14 @@
 <?php
 include_once 'includes/dbh.inc.php';
-$query = "SELECT user_id, user_first, user_last, user_email, user_uid, user_code FROM users";
 
-$response = @mysqli_query($conn, $query);
+if ($conn)
+{
+ $query = "SELECT user_id, user_first, user_last, user_email, user_uid, user_code FROM users";
 
-if ($response)
-{ ?>
+ $response = @mysqli_query($conn, $query);
+
+	if ($response)
+	{ ?>
 <button id="button_submit" disabled="disabled">Delete Selected</button><br>
 <table id="table_admin" cellpadding="8">
 <tr>
@@ -18,11 +21,11 @@ if ($response)
 <th class="col_select" id="th_select">Select</th>
 </tr>
 
-<?php
-// mysqli_fetch_array will return a row of data from the query
-// until no further data is available
-while($row = mysqli_fetch_array($response))
-{ ?>
+		<?php
+		// mysqli_fetch_array will return a row of data from the query
+		// until no further data is available
+		while($row = mysqli_fetch_array($response))
+		{ ?>
 <tr>
  <td class="col_id" align="left"><?php echo $row['user_id']; ?></td>
  <td class="col_fn" align="left"><?php echo $row['user_first']; ?></td>
@@ -32,7 +35,7 @@ while($row = mysqli_fetch_array($response))
  <td class="col_code" align="left"><?php echo $row['user_code']; ?></td>
  <td class="col_select"><input class="sampleCheckbox" name="sampleCheckbox" id="sampleCheckbox<?php echo $row['user_id']; ?>" value="sampleCheckbox<?php echo $row['user_id']; ?>" type="checkbox"></td>
  </tr>
-<?php }; ?>
+		<?php }; ?>
 </table>
 <script type = "text/javascript">
 // This function returns the element passed to it by using its ID. Its used to simply improve the efficiency of coding event handlers.
@@ -60,18 +63,25 @@ function checkSelectedInTableAdmin()
  var myArray = [];
  tr = $("table_admin").getElementsByTagName("tr");
 
+ /*
+ Below is another way of assigning 'td', however, note that if it's used and another column
+ is added to the html table, the 'td' offset (currently 6) would change, which would mean that
+ the offset '6' would have to change if the column was added before the 6th column.
+ 
+ td = tr[i].getElementsByTagName("td")[6];
+ */
+ 
   // Loop through all table rows, and hide those who don't match the search query
 	for (i = 1; i < tr.length; i++)
 	{
-	 td = tr[i].getElementsByTagName("td")[6];
-		if (td.getElementsByTagName("input")[0].checked==true)
+	 td = tr[i].querySelectorAll("td.col_select")[0]; // old (worse) version: td = tr[i].getElementsByTagName("td")[6];
+		if (td.getElementsByTagName("input")[0].checked == true)
 		{
 		 myStr = td.getElementsByTagName("input")[0].id.replace("sampleCheckbox", "");
 			if (!Number.isNaN(Number(myStr)))
 			{
 			 myStr = String(Math.trunc(Number(myStr)));
 			 myArray.push(myStr);
-			 //console.log("This one is marked for deletion: " + myStr);
 			}
 		}
 	}
@@ -105,13 +115,17 @@ addEvent(window, "load", afterAllLoadsGoGoGo);
 addEvent($("button_submit"), "click", checkSelectedInTableAdmin);
 </script>
 
-<?php }
+	<?php }
+	else
+	{
+	 echo "There was a problem with the query!";
+	}
+ mysqli_close($conn);
+}
 else
 {
-echo "Couldn't issue database query<br />";
-echo mysqli_error($conn);
+ echo "Couldn't issue database query<br />";
+ echo mysqli_connect_error($conn);
 };
 
-// Close connection to the database
-mysqli_close($conn);
 ?>

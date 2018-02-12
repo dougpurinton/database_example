@@ -111,6 +111,22 @@ function checkSelectedInTableAdmin()
  http.send(params);
 }
 
+Number.isNaN = Number.isNaN || function(value)
+{
+return value !== value;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
+if (!Math.trunc)
+{
+	Math.trunc = function(v)
+	{
+	 v = +v;
+	 if (!isFinite(v)) return v;	
+	 return (v - v % 1)   ||   (v < 0 ? -0 : v === 0 ? v : 0);
+	};
+}
+
 addEvent(window, "load", afterAllLoadsGoGoGo);
 addEvent($("button_submit"), "click", checkSelectedInTableAdmin);
 </script>

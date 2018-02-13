@@ -74,7 +74,7 @@ function checkSelectedInTableAdmin()
   // Loop through all table rows, and hide those who don't match the search query
 	for (i = 1; i < tr.length; i++)
 	{
-	 td = tr[i].querySelectorAll("td.col_select")[0]; // old (worse) version: td = tr[i].getElementsByTagName("td")[6];
+	 td = tr[i].querySelector("td.col_select"); // old (worse) version: td = tr[i].getElementsByTagName("td")[6];
 		if (td.getElementsByTagName("input")[0].checked == true)
 		{
 		 myStr = td.getElementsByTagName("input")[0].id.replace("sampleCheckbox", "");
